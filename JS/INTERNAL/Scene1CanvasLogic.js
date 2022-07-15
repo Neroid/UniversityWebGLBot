@@ -327,7 +327,7 @@ function RenderScene()
     cameraPositionVec[0] *= Math.cos(viewAngle * Math.PI/180.0);
     cameraPositionVec[0] *= Math.sin(viewAngle * Math.PI/180.0);
     glMatrix.mat4.lookAt(vMatrix, cameraPositionVec, [0,0,0], [0,0,1]);
-    glMatrix.mat4.perspective(pMatrix, (Math.PI / 180) * 90, 1, 0.01, 50);
+    glMatrix.mat4.perspective(pMatrix, (Math.PI / 180) * 90, 1, 0.01, viewDistance * 10);
     glMatrix.mat4.multiply(pvMatrix, pMatrix, vMatrix);
 
     gl.uniformMatrix4fv(PerspectiveUniformPointer, false, new Float32Array(pvMatrix));
