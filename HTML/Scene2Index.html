@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel = "stylesheet" href = "../CSS/Scene2Style.css">
+  <script src = "../JS/EXTERNAL/gl-matrix-min.js"></script>
+  <script src = "../JS/EXTERNAL/webgl-debug.js"></script>
+  <script src = "../JS/INTERNAL/Scene2CanvasLogic.js"></script>
+  <title>Scene1</title>
+</head>
+
+<body onload="Main()">
+<div class = "center">
+  <canvas class = "canvas" id="sceneCanvas"></canvas>
+  <div class = "inputDiv">
+    <table>
+      <tr>
+        <td><label for="viewAngle">View Angle:</label></td>
+        <td><input type="text" id = "viewAngle" value = "1.0" autocomplete="off"></td>
+      </tr>
+      <tr>
+        <td><label for="viewDistance">View Distance:</label></td>
+        <td><input type="text" id = "viewDistance" value = "2.0" autocomplete="off"></td>
+      </tr>
+    </table>
+
+    <table style = "margin-left: 3vmin;">
+      <tr>
+        <td>
+          <label for="LeftFrontTop">Left Front Top</label>
+        </td>
+        <td>
+          <input type="radio" id="LeftFrontTop" name="CameraPositions" value="LeftFrontTop" checked = "checked">
+        </td>
+        <td>
+          <label for="LeftFrontBottom">Left Front Bottom</label>
+        </td>
+        <td>
+          <input type="radio" id="LeftFrontBottom" name="CameraPositions" value="LeftFrontBottom">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="LeftBackTop">Left Back Top</label>
+        </td>
+        <td>
+          <input type="radio" id="LeftBackTop" name="CameraPositions" value="LeftBackTop">
+        </td>
+        <td>
+          <label for="LeftBackBottom">Left Back Bottom</label>
+        </td>
+        <td>
+          <input type="radio" id="LeftBackBottom" name="CameraPositions" value="LeftBackBottom">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="RightFrontTop">Right Front Top</label>
+        </td>
+        <td>
+          <input type="radio" id="RightFrontTop" name="CameraPositions" value="RightFrontTop">
+        </td>
+        <td>
+          <label for="RightFrontBottom">Right Front Bottom</label>
+        </td>
+        <td>
+          <input type="radio" id="RightFrontBottom" name="CameraPositions" value="RightFrontBottom">
+        </td>
+      </tr>
+      <td>
+        <label for="RightBackTop">Right Back Top</label>
+      </td>
+      <td>
+        <input type="radio" id="RightBackTop" name="CameraPositions" value="RightBackTop">
+      </td>
+      <td>
+        <label for="RightBackBottom">Right Front Bottom</label>
+      </td>
+      <td>
+        <input type="radio" id="RightBackBottom" name="CameraPositions" value="RightBackBottom">
+      </td>
+      </tr>
+    </table>
+
+  </div>
+</div>
+</body>
+</html>
+
+
