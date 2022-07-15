@@ -23,6 +23,11 @@ var PerspectiveUniformPointer;
 //Refreshing the window
 var requestID = 0;
 
+//HTML Vars
+var viewAngle;
+var viewDistance;
+var cameraPosition;
+
 function Main()
 {
     Setup();
@@ -120,28 +125,28 @@ function SetupObjectBuffers()
         0.0, 0.85, 1.0, 1.0,
 
         //Right
-        0.0, 0.40, 0.70, 1.0,
-        0.0, 0.40, 0.70, 1.0,
-        0.0, 0.40, 0.70, 1.0,
-        0.0, 0.40, 0.70, 1.0,
+        0.0, 0.70, 0.90, 1.0,
+        0.0, 0.70, 0.90, 1.0,
+        0.0, 0.70, 0.90, 1.0,
+        0.0, 0.70, 0.90, 1.0,
 
         //Left
-        0.0, 0.5, 0.8, 1.0,
-        0.0, 0.5, 0.8, 1.0,
-        0.0, 0.5, 0.8, 1.0,
-        0.0, 0.5, 0.8, 1.0,
+        0.0, 0.60, 0.8, 1.0,
+        0.0, 0.60, 0.8, 1.0,
+        0.0, 0.60, 0.8, 1.0,
+        0.0, 0.60, 0.8, 1.0,
 
         //Back
-        0.0, 0.45, 0.7, 1.0,
+        0.0, 0.45, 0.75, 1.0,
         0.0, 0.45, 0.75, 1.0,
         0.0, 0.45, 0.75, 1.0,
         0.0, 0.45, 0.75, 1.0,
 
         //Top
-        0.0, 0.3, 0.6, 1.0,
-        0.0, 0.3, 0.6, 1.0,
-        0.0, 0.3, 0.6, 1.0,
-        0.0, 0.3, 0.6, 1.0,
+        0.0, 0.6, 0.7, 1.0,
+        0.0, 0.6, 0.7, 1.0,
+        0.0, 0.6, 0.7, 1.0,
+        0.0, 0.6, 0.7, 1.0,
 
         //Bottom
         0.0, 0.2, 0.5, 1.0,
@@ -283,7 +288,45 @@ function RenderScene()
     glMatrix.mat4.identity(vMatrix);
     glMatrix.mat4.identity(pvMatrix);
 
-    glMatrix.mat4.lookAt(vMatrix, [5,-3,-2], [0,0,0], [0,1,0]);
+    cameraPosition = document.querySelector('input[name="CameraPositions"]:checked').value;
+    viewDistance = parseFloat(document.querySelector('#viewDistance').value);
+    viewAngle = parseFloat(document.querySelector('#viewAngle').value);
+
+    var cameraPositionVec = new Float32Array([0,0,0]);
+    switch(cameraPosition)
+    {
+        case "LeftFrontTop":
+            cameraPositionVec = new Float32Array([-viewDistance, -viewDistance, viewDistance]);
+            break;
+        case "LeftFrontBottom":
+            cameraPositionVec = new Float32Array([-viewDistance, -viewDistance, -viewDistance]);
+            break;
+        case "LeftBackTop":
+            cameraPositionVec = new Float32Array([-viewDistance, viewDistance, viewDistance]);
+            break;
+        case "LeftBackBottom":
+            cameraPositionVec = new Float32Array([-viewDistance, viewDistance, -viewDistance]);
+            break;
+        case "RightFrontTop":
+            cameraPositionVec = new Float32Array([viewDistance, -viewDistance, viewDistance]);
+            break;
+        case "RightFrontBottom":
+            cameraPositionVec = new Float32Array([viewDistance, -viewDistance, -viewDistance]);
+            break;
+        case "RightBackTop":
+            cameraPositionVec = new Float32Array([viewDistance, viewDistance, viewDistance]);
+            break;
+        case "RightBackBottom":
+            cameraPositionVec = new Float32Array([viewDistance, viewDistance, -viewDistance]);
+            break;
+        default:
+            cameraPositionVec = new Float32Array([1,1,1]);
+            break;
+    }
+
+    cameraPositionVec[0] *= Math.cos(viewAngle * Math.PI/180.0);
+    cameraPositionVec[0] *= Math.sin(viewAngle * Math.PI/180.0);
+    glMatrix.mat4.lookAt(vMatrix, cameraPositionVec, [0,0,0], [0,0,1]);
     glMatrix.mat4.perspective(pMatrix, (Math.PI / 180) * 90, 1, 0.01, 50);
     glMatrix.mat4.multiply(pvMatrix, pMatrix, vMatrix);
 

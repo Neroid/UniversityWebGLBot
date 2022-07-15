@@ -12,15 +12,15 @@
 <body onload="Main()">
     <div class = "center">
         <canvas class = "canvas" id="sceneCanvas"></canvas>
-            <div style = "display: flex">
+            <div class = "inputDiv">
                 <table>
                     <tr>
                         <td><label for="viewAngle">View Angle:</label></td>
-                        <td><input type="text" id = "viewAngle" value = "0.0" autocomplete="off"></td>
+                        <td><input type="text" id = "viewAngle" value = "1.0" autocomplete="off"></td>
                     </tr>
                     <tr>
                         <td><label for="viewDistance">View Distance:</label></td>
-                        <td><input type="text" id = "viewDistance" value = "0.0" autocomplete="off"></td>
+                        <td><input type="text" id = "viewDistance" value = "2.0" autocomplete="off"></td>
                     </tr>
                 </table>
 
@@ -30,7 +30,7 @@
                             <label for="LeftFrontTop">Left Front Top</label>
                         </td>
                         <td>
-                            <input type="radio" id="LeftFrontTop" name="CameraPositions" value="LeftFrontTop">
+                            <input type="radio" id="LeftFrontTop" name="CameraPositions" value="LeftFrontTop" checked = "checked">
                         </td>
                         <td>
                             <label for="LeftFrontBottom">Left Front Bottom</label>

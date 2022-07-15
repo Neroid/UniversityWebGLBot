@@ -14,6 +14,14 @@ body {
     align-items: center;
 }
 
+.inputDiv
+{
+    display: flex;
+    background-color: rgba(100, 100, 100, 0.5);
+    border-radius: 0.1vmin;
+    border: 0.4vmin solid black;
+}
+
 label{
     color: #FFFFFF;
     text-shadow: -0.10vmin -0.16vmin 0.05vmax black;
@@ -30,5 +38,5 @@ input{
 .canvas
 {
     border-spacing: 0;
-    border: 3px solid lightblue;
+    border: 0.4vmin solid lightblue;
 }
