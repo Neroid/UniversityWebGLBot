@@ -14,7 +14,6 @@ var HandsColorBuffer;
 var LegsColorBuffer;
 var FeetColorBuffer;
 
-
 var cubeIndexBuffer;
 
 

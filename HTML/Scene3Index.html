@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link rel = "stylesheet" href = "../CSS/Scene2Style.css">
+  <link rel = "stylesheet" href = "../CSS/Scene3Style.css">
   <script src = "../JS/EXTERNAL/gl-matrix-min.js"></script>
   <script src = "../JS/EXTERNAL/webgl-debug.js"></script>
-  <script src = "../JS/INTERNAL/Scene2CanvasLogic.js"></script>
+  <script src = "../JS/INTERNAL/Scene3CanvasLogic.js"></script>
   <title>Scene 2</title>
 </head>
 
@@ -17,6 +17,10 @@
       <tr>
         <td><label for="viewAngle">View Angle:</label></td>
         <td><input type="text" id = "viewAngle" value = "45.0" autocomplete="off"></td>
+      </tr>
+      <tr>
+        <td><label for="viewRotation">View Rotation:</label></td>
+        <td><input type="text" id = "viewRotation" value = "1.0" autocomplete="off"></td>
       </tr>
       <tr>
         <td><label for="viewDistance">View Distance:</label></td>
@@ -52,6 +56,7 @@
         <td>
           <input type="radio" id="LeftBackBottom" name="CameraPositions" value="LeftBackBottom">
         </td>
+
       </tr>
       <tr>
         <td>
@@ -82,7 +87,18 @@
       </td>
       </tr>
     </table>
-
+    <table style = "margin-left: 3vmin;">
+      <tr>
+        <td>
+          <input type="button" onclick="StartSpinCamera()" value="Start">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="button" onclick="StopSpinCamera()" value="Stop">
+        </td>
+      </tr>
+    </table>
   </div>
 </div>
 </body>
