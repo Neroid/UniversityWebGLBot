@@ -622,7 +622,9 @@ function SetupObjectBuffers()
 
     //All UV + Textures Made By Me
     HeadTexture = GL.createTexture();
-    var headImgURL = "./../../Images/UVS/Head.png";
+
+    //TEST TO DEBUG GITHUB PAGES
+    var headImgURL = "Head.png";
     TextureLoader(headImgURL, HeadTexture);
 
     SkyboxTexture = GL.createTexture();
