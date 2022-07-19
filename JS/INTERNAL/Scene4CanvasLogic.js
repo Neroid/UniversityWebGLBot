@@ -622,31 +622,31 @@ function SetupObjectBuffers()
 
     //All UV + Textures Made By Me
     HeadTexture = GL.createTexture();
-    var headImgURL = "../../Images/UVS/Head.png";
+    var headImgURL = "./../../Images/UVS/Head.png";
     TextureLoader(headImgURL, HeadTexture);
 
     SkyboxTexture = GL.createTexture();
-    var skyImgURL = "../../Images/SkyBox.png";
+    var skyImgURL = "./../../Images/SkyBox.png";
     TextureLoader(skyImgURL, SkyboxTexture);
 
     GroundTexture = GL.createTexture();
-    var groundImgURL = "../../Images/Ground.png";
+    var groundImgURL = "./../../Images/Ground.png";
     TextureLoader(groundImgURL, GroundTexture);
 
     ChestTexture = GL.createTexture();
-    var bodyImgURL = "../../Images/UVS/Body.png";
+    var bodyImgURL = "./../../Images/UVS/Body.png";
     TextureLoader(bodyImgURL, ChestTexture);
 
     HandsTexture = GL.createTexture();
-    var handsImgURL = "../../Images/UVS/Hands.png";
+    var handsImgURL = "./../../Images/UVS/Hands.png";
     TextureLoader(handsImgURL, HandsTexture);
 
     LegsTexture = GL.createTexture();
-    var legsImgURL = "../../Images/UVS/Legs.png";
+    var legsImgURL = "./../../Images/UVS/Legs.png";
     TextureLoader(legsImgURL, LegsTexture);
 
     FeetTexture = GL.createTexture();
-    var feetImgURL = "../../Images/UVS/Feet.png";
+    var feetImgURL = "./../../Images/UVS/Feet.png";
     TextureLoader(feetImgURL, FeetTexture);
 }
 
