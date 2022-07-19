@@ -622,33 +622,31 @@ function SetupObjectBuffers()
 
     //All UV + Textures Made By Me
     HeadTexture = GL.createTexture();
-
-    //TEST TO DEBUG GITHUB PAGES
-    var headImgURL = "Head.png";
+    var headImgURL = "./../Images/UVS/Head.png";
     TextureLoader(headImgURL, HeadTexture);
 
     SkyboxTexture = GL.createTexture();
-    var skyImgURL = "./../../Images/SkyBox.png";
+    var skyImgURL = "./../Images/SkyBox.png";
     TextureLoader(skyImgURL, SkyboxTexture);
 
     GroundTexture = GL.createTexture();
-    var groundImgURL = "./../../Images/Ground.png";
+    var groundImgURL = "./../Images/Ground.png";
     TextureLoader(groundImgURL, GroundTexture);
 
     ChestTexture = GL.createTexture();
-    var bodyImgURL = "./../../Images/UVS/Body.png";
+    var bodyImgURL = "./../Images/UVS/Body.png";
     TextureLoader(bodyImgURL, ChestTexture);
 
     HandsTexture = GL.createTexture();
-    var handsImgURL = "./../../Images/UVS/Hands.png";
+    var handsImgURL = "./../Images/UVS/Hands.png";
     TextureLoader(handsImgURL, HandsTexture);
 
     LegsTexture = GL.createTexture();
-    var legsImgURL = "./../../Images/UVS/Legs.png";
+    var legsImgURL = "./../Images/UVS/Legs.png";
     TextureLoader(legsImgURL, LegsTexture);
 
     FeetTexture = GL.createTexture();
-    var feetImgURL = "./../../Images/UVS/Feet.png";
+    var feetImgURL = "./../Images/UVS/Feet.png";
     TextureLoader(feetImgURL, FeetTexture);
 }
 
@@ -949,9 +947,9 @@ function RenderScene()
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
 
-    GL.activeTexture(GL.TEXTURE0);
+    GL.activeTexture(GL.TEXTURE2);
     GL.bindTexture(GL.TEXTURE_2D, HeadTexture);
-    GL.uniform1i(SamplerPointer, 0);
+    GL.uniform1i(SamplerPointer, 2);
     GL.bindBuffer(GL.ARRAY_BUFFER, HeadCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, HeadCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -1020,9 +1018,9 @@ function RenderScene()
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
-    GL.activeTexture(GL.TEXTURE1);
+    GL.activeTexture(GL.TEXTURE3);
     GL.bindTexture(GL.TEXTURE_2D, ChestTexture);
-    GL.uniform1i(SamplerPointer, 1);
+    GL.uniform1i(SamplerPointer, 3);
     GL.bindBuffer(GL.ARRAY_BUFFER, ChestCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, ChestCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -1106,9 +1104,9 @@ function RenderScene()
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
-    GL.activeTexture(GL.TEXTURE2);
+    GL.activeTexture(GL.TEXTURE4);
     GL.bindTexture(GL.TEXTURE_2D, HandsTexture);
-    GL.uniform1i(SamplerPointer, 2);
+    GL.uniform1i(SamplerPointer, 4);
     GL.bindBuffer(GL.ARRAY_BUFFER, HandsCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, HandsCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -1284,9 +1282,9 @@ function RenderScene()
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
-    GL.activeTexture(GL.TEXTURE3);
+    GL.activeTexture(GL.TEXTURE5);
     GL.bindTexture(GL.TEXTURE_2D, LegsTexture);
-    GL.uniform1i(SamplerPointer, 3);
+    GL.uniform1i(SamplerPointer, 5);
     GL.bindBuffer(GL.ARRAY_BUFFER, LegsCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, LegsCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -1416,9 +1414,9 @@ function RenderScene()
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
-    GL.activeTexture(GL.TEXTURE4);
+    GL.activeTexture(GL.TEXTURE6);
     GL.bindTexture(GL.TEXTURE_2D, FeetTexture);
-    GL.uniform1i(SamplerPointer, 4);
+    GL.uniform1i(SamplerPointer, 6);
     GL.bindBuffer(GL.ARRAY_BUFFER, FeetCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, FeetCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
