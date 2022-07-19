@@ -51,7 +51,7 @@ var AnimationRequestID = 0;
 
 //HTML Vars
 var ViewAngle;
-var rotationStep;
+var RotationStep;
 var ViewDistance;
 var CameraPosition
 
@@ -513,10 +513,18 @@ function RenderScene()
     glMatrix.mat4.identity(ViewMatrix);
     glMatrix.mat4.identity(PerspectiveViewMatrix);
 
-    CameraPosition = document.querySelector('input[name="CameraPositions"]:checked').value;
-    ViewDistance = parseFloat(document.querySelector('#viewDistance').value);
-    ViewAngle = parseFloat(document.querySelector('#viewAngle').value);
-    rotationStep = parseFloat(document.querySelector('#viewRotation').value);
+    var cameraPositionRef = document.querySelector('input[name="CameraPositions"]:checked');
+    CameraPosition = cameraPositionRef ? cameraPositionRef.value : "";
+
+    var viewDistanceRef = document.querySelector('#viewDistance');
+    ViewDistance = viewDistanceRef ? parseFloat( viewDistanceRef.value) : 0.0;
+
+    var viewAngleRef = document.querySelector('#viewAngle');
+    ViewAngle = viewAngleRef ? parseFloat(viewAngleRef.value) : 0.0;
+
+    var rotationStepRef = document.querySelector('#viewRotation');
+    RotationStep = rotationStepRef ? parseFloat( rotationStepRef.value) : 0.0;
+
     var cameraPositionVec = new Float32Array([0,0,0]);
     switch(CameraPosition)
     {
@@ -551,7 +559,7 @@ function RenderScene()
 
     if(AnimateCamera)
     {
-        TotalCameraAngle += rotationStep;
+        TotalCameraAngle += RotationStep;
     }
     else
     {

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../CSS/styles.css">
+    <script>
+        function LoadScene(scene)
+        {
+            window.location = "Scene" + scene + "Index.html";
+            return false;
+        }
+    </script>
+</head>
+<body>
+  <div class="container-1">
+
+    <div class="face">
+    <div class="box">
+        <div class="eye">
+          <div class="ball"></div>
+        </div>
+        <div class="eye">
+          <div class="ball"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ButtonArea">
+        <table>
+            <tr>
+                <td>
+                    <div class="but1">
+                        <button onclick="LoadScene(1);">Scene 1</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="but2">
+                        <button onclick="LoadScene(2);">Scene 2</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="but3">
+                        <button onclick="LoadScene(3);">Scene 3</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="but4">
+                        <button onclick="LoadScene(4);">Scene 4</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+  </div>
+</body>
+
+  <footer>
+    <p>Nektarios Neroutsos-Nikolaos Sergis 2022&copy</p>
+  </footer>
+
+  <script> 
+    var balls = document.getElementsByClassName("ball");
+  document.onmousemove = function(){
+    var x = event.clientX * 100 / window.innerWidth + "%";
+    var y = event.clientY * 100 / window.innerHeight + "%";
+    
+    for(var i=0;i<2;i++){
+      balls[i].style.left = x;
+      balls[i].style.top = y;
+      balls[i].style.transform = "translate(-"+x+",-"+y+")";
+    }
+  }
+  </script>
+</body>
+</html>
+
