@@ -6,6 +6,13 @@
   <script src = "../JS/EXTERNAL/gl-matrix-min.js"></script>
   <script src = "../JS/EXTERNAL/webgl-debug.js"></script>
   <script src = "../JS/INTERNAL/Scene2CanvasLogic.js"></script>
+  <script>
+    function LoadMainIndex()
+    {
+      window.location = "index.html";
+      return false;
+    }
+  </script>
   <title>Scene 2</title>
 </head>
 
@@ -82,7 +89,13 @@
       </td>
       </tr>
     </table>
-
+    <table>
+      <tr>
+        <td>
+          <input type="button" class = "button" onclick="LoadMainIndex()" value="Main Menu">
+        </td>
+      </tr>
+    </table>
   </div>
 </div>
 </body>

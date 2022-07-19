@@ -16,9 +16,11 @@ var ChestCoordsTextureBuffer;
 var HandsCoordsTextureBuffer;
 var LegsCoordsTextureBuffer;
 var FeetCoordsTextureBuffer;
+var SkyboxCoordsTextureBuffer;
+var GroundCoordsTextureBuffer;
 
 var CubeIndexBuffer;
-
+var SkyboxIndexBuffer;
 
 //Camera Buffers
 var ViewMatrix = new Float32Array(16);
@@ -26,8 +28,8 @@ var PerspectiveMatrix = new Float32Array(16);
 var PerspectiveViewMatrix = new Float32Array(16);
 
 //Camera Vars
-var TotalCameraAngle = 0;
 var AnimateCamera = false;
+var WasAnimated = false;
 
 //Animation Vars
 var HeadAnimationRotationTotal = 0;
@@ -42,6 +44,9 @@ var WalkAnimSpeedTorso = 0.005;
 var WalkAnimSpeedHands = 0.02;
 var WalkAnimSpeedLegs = 0.04;
 
+var DropAnimSpeed = 0.04;
+var RiseAnimSpeed = 0.01;
+var CurOnOffSpeed = 0.04;
 
 var OffReturnMultiplier = 1;
 
@@ -75,6 +80,9 @@ var ChestTexture;
 var HandsTexture;
 var LegsTexture;
 var FeetTexture;
+var SkyboxTexture;
+var GroundTexture;
+
 
 //Matrix buffers to avoid constant reallocs
 var TranslateMatrix = new Float32Array(16);
@@ -93,9 +101,15 @@ var ViewDistance;
 var CameraPosition;
 var AnimationType = "";
 var PreviousAnimationType = "";
+var Rect;
 
-//Mouse events
+//Mouse
 var MouseWheelInput = 0;
+var XMove = 0.0;
+var YMove = 0.0;
+var LastMouseX = 0.0;
+var LastMouseY = 0.0;
+var MouseHeld = false;
 
 function Main()
 {
@@ -131,11 +145,46 @@ function Setup()
     GL.frontFace(GL.CCW);
     GL.enable(GL.CULL_FACE);
     GL.cullFace(GL.BACK);
+    Rect = Canvas.getBoundingClientRect();
+
+    LastMouseX = 0;
+    LastMouseY = 0;
+
+    Canvas.onmousedown = (event) => {
+        LastMouseY = event.clientX - Rect.left;
+        LastMouseY = Rect.bottom - event.clientY;;
+        if(AnimateCamera)
+        {
+            WasAnimated = true;
+        }
+        AnimateCamera = false;
+        MouseHeld = true;
+    };
+    window.onmouseup = (event) =>
+    {
+        if(WasAnimated)
+        {
+            AnimateCamera = true;
+        }
+        MouseHeld = false;
+    };
+    Canvas.onmousemove = (event) =>
+    {
+        if(MouseHeld)
+        {
+            var currMouseX = event.clientX - Rect.left;
+            var currMouseY = Rect.bottom - event.clientY;
+            XMove += 0.6 * (currMouseX - LastMouseX);
+            YMove += 0.6 * (currMouseY - LastMouseY);
+            LastMouseX = currMouseX;
+            LastMouseY = currMouseY;
+        }
+    }
+
 
     addEventListener('wheel', (evt) => {
             MouseWheelInput += evt.deltaY > 0 ? -0.2 * AnimationRotationStep : 0.2 * AnimationRotationStep;
             MouseWheelInput = MouseWheelInput >= 32 ? 32 : MouseWheelInput <= -32 ? -32 : MouseWheelInput;
-
     });
 
     SetupObjectBuffers();
@@ -416,6 +465,108 @@ function SetupObjectBuffers()
         0.624, 0.624,
     ]);
 
+    var skyboxTextureCoordinates = new Float32Array([
+        //Front
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Right
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+        0.0, 0.0,
+
+        //Left
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Back
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Top
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Bottom
+        0.0, 1.0,
+        0.0, 0.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    ]);
+
+    var groundTextureCoordinates = new Float32Array([
+        //Front
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Right
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+        0.0, 0.0,
+
+        //Left
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Back
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Top
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Bottom
+        0.0, 1.0,
+        0.0, 0.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    ]);
+
+    var skyboxIndexBufferData = new Uint16Array([
+        //Front
+        0,2,1,
+        2,0,3,
+
+        //Right
+        4,6,5,
+        7,6,4,
+
+        //Left
+        8,10,9,
+        8,11,10,
+
+        //Back
+        12,14,13,
+        15,14,12,
+
+        //Top
+        16,18,17,
+        19,18,16,
+
+        //Bottom
+        20,22,21,
+        20,23,22,
+    ]);
+
     //Feed Data Into Respective Buffers
     CubeVerticesBuffer = GL.createBuffer();
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
@@ -428,6 +579,21 @@ function SetupObjectBuffers()
     GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, CubeIndexBuffer);
     GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, cubeIndexBufferData, GL.STATIC_DRAW);
     CubeIndexBuffer.itemCount = 36;
+
+    SkyboxIndexBuffer = GL.createBuffer();
+    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, SkyboxIndexBuffer);
+    GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, skyboxIndexBufferData, GL.STATIC_DRAW);
+    SkyboxIndexBuffer.itemCount = 36;
+
+    SkyboxCoordsTextureBuffer = GL.createBuffer();
+    GL.bindBuffer(GL.ARRAY_BUFFER, SkyboxCoordsTextureBuffer);
+    GL.bufferData(GL.ARRAY_BUFFER, skyboxTextureCoordinates, GL.STATIC_DRAW);
+    SkyboxCoordsTextureBuffer.itemSize = 2;
+
+    GroundCoordsTextureBuffer = GL.createBuffer();
+    GL.bindBuffer(GL.ARRAY_BUFFER, GroundCoordsTextureBuffer);
+    GL.bufferData(GL.ARRAY_BUFFER, groundTextureCoordinates, GL.STATIC_DRAW);
+    GroundCoordsTextureBuffer.itemSize = 2;
 
     HeadCoordsTextureBuffer = GL.createBuffer();
     GL.bindBuffer(GL.ARRAY_BUFFER, HeadCoordsTextureBuffer);
@@ -458,6 +624,14 @@ function SetupObjectBuffers()
     HeadTexture = GL.createTexture();
     var headImgURL = "../../Images/UVS/Head.png";
     TextureLoader(headImgURL, HeadTexture);
+
+    SkyboxTexture = GL.createTexture();
+    var skyImgURL = "../../Images/SkyBox.png";
+    TextureLoader(skyImgURL, SkyboxTexture);
+
+    GroundTexture = GL.createTexture();
+    var groundImgURL = "../../Images/Ground.png";
+    TextureLoader(groundImgURL, GroundTexture);
 
     ChestTexture = GL.createTexture();
     var bodyImgURL = "../../Images/UVS/Body.png";
@@ -603,23 +777,63 @@ function RenderScene()
 
     if(AnimateCamera)
     {
-        TotalCameraAngle += RotationStep;
+        YMove += RotationStep;
+        XMove += RotationStep;
     }
-    else
+    else if(!MouseHeld)
     {
-        TotalCameraAngle = ViewAngle;
+        XMove = ViewAngle;
+        YMove = ViewAngle;
     }
 
-    cameraPositionVec[0] *= Math.cos(TotalCameraAngle * Math.PI/180.0);
-    cameraPositionVec[1] *= Math.sin(TotalCameraAngle * Math.PI/180.0);
+    var totalX = XMove * Math.PI/180.0;
+    var totalY = YMove * Math.PI/180.0;
+
+    cameraPositionVec[0] *= Math.cos(totalX);
+    cameraPositionVec[1] *= Math.sin(totalY);
 
     glMatrix.mat4.lookAt(ViewMatrix, cameraPositionVec, [0,0,0], [0,0,1]);
-    glMatrix.mat4.perspective(PerspectiveMatrix, (Math.PI / 180) * 90, 1, 0.01, ViewDistance * 10);
+    glMatrix.mat4.perspective(PerspectiveMatrix, (Math.PI / 180) * 90, 1, 0.01, 10000);
     glMatrix.mat4.multiply(PerspectiveViewMatrix, PerspectiveMatrix, ViewMatrix);
 
 
     GL.uniformMatrix4fv(PerspectiveUniformPointer, false, new Float32Array(PerspectiveViewMatrix));
 
+    //Skybox ===========================================
+    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, SkyboxIndexBuffer);
+
+    glMatrix.mat4.fromScaling(ScaleMatrix, new Float32Array([5000, 5000, 5000]));
+    GL.uniformMatrix4fv(TranslateUniformPointer, false, new Float32Array(ScaleMatrix));
+
+
+    GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
+    GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+    GL.activeTexture(GL.TEXTURE0);
+    GL.bindTexture(GL.TEXTURE_2D, SkyboxTexture);
+    GL.uniform1i(SamplerPointer, 0);
+    GL.bindBuffer(GL.ARRAY_BUFFER, SkyboxCoordsTextureBuffer);
+    GL.vertexAttribPointer(TextureCoordsAttributePointer, SkyboxCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
+    GL.drawElements(GL.TRIANGLES, SkyboxIndexBuffer.itemCount, GL.UNSIGNED_SHORT, 0);
+
+    //Ground ==================================================
+    glMatrix.mat4.fromScaling(ScaleMatrix, new Float32Array([50,50,1]));
+    glMatrix.mat4.fromTranslation(TranslateMatrix, new Float32Array([0,0,-1]));
+    glMatrix.mat4.multiply(TranslateScaleMatrix, TranslateMatrix, ScaleMatrix);
+
+    GL.uniformMatrix4fv(TranslateUniformPointer, false, new Float32Array(TranslateScaleMatrix));
+
+    GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
+    GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+
+    GL.activeTexture(GL.TEXTURE1);
+    GL.bindTexture(GL.TEXTURE_2D, GroundTexture);
+    GL.uniform1i(SamplerPointer, 1);
+    GL.bindBuffer(GL.ARRAY_BUFFER, GroundCoordsTextureBuffer);
+    GL.vertexAttribPointer(TextureCoordsAttributePointer, GroundCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+    GL.drawElements(GL.TRIANGLES, CubeIndexBuffer.itemCount, GL.UNSIGNED_SHORT, 0);
 
     //Animation Type ===========================================
     var AnimationTypeRef = document.querySelector('input[name="Animation"]:checked');
@@ -640,6 +854,7 @@ function RenderScene()
         PreviousAnimationType = AnimationType;
     }
 
+    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, CubeIndexBuffer);
     //Head ================================================
     var headVertexOffset = new Float32Array([0,1,24.5]);
 
@@ -699,15 +914,17 @@ function RenderScene()
     }
     else if(AnimationType === "On/Off")
     {
-        HeadAnimationRotationTotal -= 0.01 * OffReturnMultiplier / Math.PI * 180;
+        HeadAnimationRotationTotal -= CurOnOffSpeed * OffReturnMultiplier / Math.PI * 180;
 
         if(HeadAnimationRotationTotal < -90) {
             HeadAnimationRotationTotal = -90;
             OffReturnMultiplier *= -1;
+            CurOnOffSpeed = RiseAnimSpeed;
         }
         else if(HeadAnimationRotationTotal  > 0) {
             HeadAnimationRotationTotal = 0;
             OffReturnMultiplier *= -1;
+            CurOnOffSpeed = DropAnimSpeed;
         }
 
         headRot = HeadAnimationRotationTotal/180 * Math.PI;
@@ -777,7 +994,7 @@ function RenderScene()
     }
     else if(AnimationType === "On/Off")
     {
-        TorsoAnimationRotationTotal -= 0.01 * OffReturnMultiplier / Math.PI * 180;
+        TorsoAnimationRotationTotal -= CurOnOffSpeed * OffReturnMultiplier / Math.PI * 180;
 
         if (TorsoAnimationRotationTotal < -90) {
             TorsoAnimationRotationTotal = -90;
@@ -863,7 +1080,7 @@ function RenderScene()
     else if(AnimationType === "On/Off")
     {
         //Inverse due to looking at -Y
-        LHandAnimationRotationTotal -= 0.01 * OffReturnMultiplier / Math.PI * 180;
+        LHandAnimationRotationTotal -= CurOnOffSpeed * OffReturnMultiplier / Math.PI * 180;
 
         if(LHandAnimationRotationTotal < -90) {
             LHandAnimationRotationTotal = -90;
@@ -957,7 +1174,7 @@ function RenderScene()
     else if(AnimationType === "On/Off")
     {
         //Non inverse for walking actions
-        RHandAnimationRotationTotal -= 0.01 * OffReturnMultiplier / Math.PI * 180;
+        RHandAnimationRotationTotal -= CurOnOffSpeed * OffReturnMultiplier / Math.PI * 180;
 
         if(RHandAnimationRotationTotal < -90) {
             RHandAnimationRotationTotal = -90;
@@ -1039,7 +1256,7 @@ function RenderScene()
     }
     else if(AnimationType === "On/Off")
     {
-        LLegAnimationRotationTotal -= 0.01 * OffReturnMultiplier / Math.PI * 180;
+        LLegAnimationRotationTotal -= CurOnOffSpeed * OffReturnMultiplier / Math.PI * 180;
 
         if(LLegAnimationRotationTotal < -90) {
             //Since the last part is animated flip the walking if this occurs
@@ -1129,7 +1346,7 @@ function RenderScene()
     }
     else if(AnimationType === "On/Off")
     {
-        RLegAnimationRotationTotal -= 0.01 * OffReturnMultiplier / Math.PI * 180;
+        RLegAnimationRotationTotal -= CurOnOffSpeed * OffReturnMultiplier / Math.PI * 180;
 
         if(RLegAnimationRotationTotal < -90) {
             //Since the last part is animated flip the walking if this occurs
@@ -1260,6 +1477,7 @@ function StartSpinCamera()
 function StopSpinCamera()
 {
     AnimateCamera = false;
+    WasAnimated = false;
 }
 
 function TextureLoader(imageURL, textureTarget)

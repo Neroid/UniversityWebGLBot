@@ -14,25 +14,40 @@ body {
     align-items: center;
 }
 
+.button
+{
+    border: none;
+    color: white;
+    padding: 0.01vmin 0.01vmin;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.25vmin;
+    margin: 0.05vmin 0.01vmin;
+    cursor: pointer;
+    background-color: #008CBA;
+    white-space: normal;
+}
+
 .inputDiv
 {
     display: flex;
     background-color: rgba(100, 100, 100, 0.5);
     border-radius: 0.1vmin;
-    border: 0.4vmin solid black;
+    border: 0.3vmin solid black;
 }
 
 label{
     color: #FFFFFF;
     text-shadow: -0.10vmin -0.16vmin 0.05vmax black;
-    font-size: 3.5vmin;
+    font-size: 2.5vmin;
 }
 
 input{
     margin-left: 1vmin;
-    width:4.5vmax;
+    width:4vmax;
     height:3vmin;
-    font-size: 2.4vmin;
+    font-size: 2vmin;
 }
 
 .canvas

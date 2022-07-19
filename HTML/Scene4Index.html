@@ -6,6 +6,20 @@
   <script src = "../JS/EXTERNAL/gl-matrix-min.js"></script>
   <script src = "../JS/EXTERNAL/webgl-debug.js"></script>
   <script src = "../JS/INTERNAL/Scene4CanvasLogic.js"></script>
+  <script>
+    function LoadMainIndex()
+    {
+      window.location = "index.html";
+      return false;
+    }
+  </script>
+  <script>
+      function LoadMainIndex()
+            {
+              window.location = "index.html";
+              return false;
+            }
+  </script>
   <title>Scene 2</title>
 </head>
 
@@ -147,12 +161,17 @@
     <table style = "margin-left: 3vmin;">
       <tr>
         <td>
-          <input type="button" onclick="StartSpinCamera()" value="Start">
+          <input type="button" class = "button" onclick="StartSpinCamera()" value="Start">
         </td>
       </tr>
       <tr>
         <td>
-          <input type="button" onclick="StopSpinCamera()" value="Stop">
+          <input type="button" class = "button" onclick="StopSpinCamera()" value="Stop">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="button" class = "button" onclick="LoadMainIndex()" value="Main Menu">
         </td>
       </tr>
     </table>

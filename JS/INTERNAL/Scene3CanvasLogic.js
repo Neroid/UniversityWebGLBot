@@ -13,8 +13,11 @@ var ChestCoordsTextureBuffer;
 var HandsCoordsTextureBuffer;
 var LegsCoordsTextureBuffer;
 var FeetCoordsTextureBuffer;
+var SkyboxCoordsTextureBuffer;
+var GroundCoordsTextureBuffer;
 
 var CubeIndexBuffer;
+var SkyboxIndexBuffer;
 
 
 //Camera Buffers
@@ -23,8 +26,8 @@ var PerspectiveMatrix = new Float32Array(16);
 var PerspectiveViewMatrix = new Float32Array(16);
 
 //Camera Vars
-var TotalCameraAngle = 0;
 var AnimateCamera = false;
+var WasAnimated = false;
 
 //Shaders Buffers
 var VertexPositionAttributePointer;
@@ -40,6 +43,8 @@ var ChestTexture;
 var HandsTexture;
 var LegsTexture;
 var FeetTexture;
+var SkyboxTexture;
+var GroundTexture;
 
 //Support vars
 var TranslateMatrix = new Float32Array(16);
@@ -53,7 +58,15 @@ var AnimationRequestID = 0;
 var ViewAngle;
 var RotationStep;
 var ViewDistance;
-var CameraPosition
+var CameraPosition;
+var Rect;
+
+//Mouse
+var XMove = 0.0;
+var YMove = 0.0;
+var LastMouseX = 0.0;
+var LastMouseY = 0.0;
+var MouseHeld = false;
 
 function Main()
 {
@@ -89,6 +102,41 @@ function Setup()
     GL.frontFace(GL.CCW);
     GL.enable(GL.CULL_FACE);
     GL.cullFace(GL.BACK);
+    Rect = Canvas.getBoundingClientRect();
+
+    LastMouseX = 0;
+    LastMouseY = 0;
+
+    Canvas.onmousedown = (event) => {
+        LastMouseY = event.clientX - Rect.left;
+        LastMouseY = Rect.bottom - event.clientY;;
+        if(AnimateCamera)
+        {
+            WasAnimated = true;
+        }
+        AnimateCamera = false;
+        MouseHeld = true;
+    };
+    window.onmouseup = (event) =>
+    {
+        if(WasAnimated)
+        {
+            AnimateCamera = true;
+        }
+        MouseHeld = false;
+    };
+    Canvas.onmousemove = (event) =>
+    {
+        if(MouseHeld)
+        {
+            var currMouseX = event.clientX - Rect.left;
+            var currMouseY = Rect.bottom - event.clientY;
+            XMove += 0.6 * (currMouseX - LastMouseX);
+            YMove += 0.6 * (currMouseY - LastMouseY);
+            LastMouseX = currMouseX;
+            LastMouseY = currMouseY;
+        }
+    }
 
     SetupObjectBuffers();
     SetupShaders()
@@ -176,6 +224,32 @@ function SetupObjectBuffers()
         //Bottom
         20,21,22,
         22,23,20,
+    ]);
+
+    var skyboxIndexBufferData = new Uint16Array([
+        //Front
+        0,2,1,
+        2,0,3,
+
+        //Right
+        4,6,5,
+        7,6,4,
+
+        //Left
+        8,10,9,
+        8,11,10,
+
+        //Back
+        12,14,13,
+        15,14,12,
+
+        //Top
+        16,18,17,
+        19,18,16,
+
+        //Bottom
+        20,22,21,
+        20,23,22,
     ]);
 
     var headTextureCoordinates = new Float32Array([
@@ -368,6 +442,82 @@ function SetupObjectBuffers()
         0.624, 0.624,
     ]);
 
+    var skyboxTextureCoordinates = new Float32Array([
+        //Front
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Right
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+        0.0, 0.0,
+
+        //Left
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Back
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Top
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Bottom
+        0.0, 1.0,
+        0.0, 0.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    ]);
+
+    var groundTextureCoordinates = new Float32Array([
+        //Front
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Right
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+        0.0, 0.0,
+
+        //Left
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Back
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Top
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+
+        //Bottom
+        0.0, 1.0,
+        0.0, 0.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    ]);
+
     //Feed Data Into Respective Buffers
     CubeVerticesBuffer = GL.createBuffer();
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
@@ -381,11 +531,25 @@ function SetupObjectBuffers()
     GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, cubeIndexBufferData, GL.STATIC_DRAW);
     CubeIndexBuffer.itemCount = 36;
 
+    SkyboxIndexBuffer = GL.createBuffer();
+    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, SkyboxIndexBuffer);
+    GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, skyboxIndexBufferData, GL.STATIC_DRAW);
+    SkyboxIndexBuffer.itemCount = 36;
+
+    SkyboxCoordsTextureBuffer = GL.createBuffer();
+    GL.bindBuffer(GL.ARRAY_BUFFER, SkyboxCoordsTextureBuffer);
+    GL.bufferData(GL.ARRAY_BUFFER, skyboxTextureCoordinates, GL.STATIC_DRAW);
+    SkyboxCoordsTextureBuffer.itemSize = 2;
+
+    GroundCoordsTextureBuffer = GL.createBuffer();
+    GL.bindBuffer(GL.ARRAY_BUFFER, GroundCoordsTextureBuffer);
+    GL.bufferData(GL.ARRAY_BUFFER, groundTextureCoordinates, GL.STATIC_DRAW);
+    GroundCoordsTextureBuffer.itemSize = 2;
+
     HeadCoordsTextureBuffer = GL.createBuffer();
     GL.bindBuffer(GL.ARRAY_BUFFER, HeadCoordsTextureBuffer);
     GL.bufferData(GL.ARRAY_BUFFER, headTextureCoordinates, GL.STATIC_DRAW);
     HeadCoordsTextureBuffer.itemSize = 2;
-    HeadCoordsTextureBuffer.itemCount = 24;
 
     ChestCoordsTextureBuffer = GL.createBuffer();
     GL.bindBuffer(GL.ARRAY_BUFFER, ChestCoordsTextureBuffer);
@@ -410,6 +574,14 @@ function SetupObjectBuffers()
     HeadTexture = GL.createTexture();
     var headImgURL = "../../Images/UVS/Head.png";
     TextureLoader(headImgURL, HeadTexture);
+
+    SkyboxTexture = GL.createTexture();
+    var skyImgURL = "../../Images/SkyBox.png";
+    TextureLoader(skyImgURL, SkyboxTexture);
+
+    GroundTexture = GL.createTexture();
+    var groundImgURL = "../../Images/Ground.png";
+    TextureLoader(groundImgURL, GroundTexture);
 
     ChestTexture = GL.createTexture();
     var bodyImgURL = "../../Images/UVS/Body.png";
@@ -556,36 +728,75 @@ function RenderScene()
             cameraPositionVec = new Float32Array([1,1,1]);
             break;
     }
-
     if(AnimateCamera)
     {
-        TotalCameraAngle += RotationStep;
+        YMove += RotationStep;
+        XMove += RotationStep;
     }
-    else
+    else if(!MouseHeld)
     {
-        TotalCameraAngle = ViewAngle;
+        XMove = ViewAngle;
+        YMove = ViewAngle;
     }
 
-    cameraPositionVec[0] *= Math.cos(TotalCameraAngle * Math.PI/180.0);
-    cameraPositionVec[1] *= Math.sin(TotalCameraAngle * Math.PI/180.0);
+    var totalX = XMove * Math.PI/180.0;
+    var totalY = YMove * Math.PI/180.0;
 
+    cameraPositionVec[0] *= Math.cos(totalX);
+    cameraPositionVec[1] *= Math.sin(totalY);
     glMatrix.mat4.lookAt(ViewMatrix, cameraPositionVec, [0,0,0], [0,0,1]);
-    glMatrix.mat4.perspective(PerspectiveMatrix, (Math.PI / 180) * 90, 1, 0.01, ViewDistance * 10);
+    glMatrix.mat4.perspective(PerspectiveMatrix, (Math.PI / 180) * 90, 1, 0.01, 10000);
     glMatrix.mat4.multiply(PerspectiveViewMatrix, PerspectiveMatrix, ViewMatrix);
 
     GL.uniformMatrix4fv(PerspectiveUniformPointer, false, new Float32Array(PerspectiveViewMatrix));
 
+    //Skybox ===========================================
+    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, SkyboxIndexBuffer);
+
+    glMatrix.mat4.fromScaling(ScaleMatrix, new Float32Array([5000, 5000, 5000]));
+    GL.uniformMatrix4fv(TranslateUniformPointer, false, new Float32Array(ScaleMatrix));
+
+
+    GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
+    GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+
+    GL.activeTexture(GL.TEXTURE0);
+    GL.bindTexture(GL.TEXTURE_2D, SkyboxTexture);
+    GL.uniform1i(SamplerPointer, 0);
+    GL.bindBuffer(GL.ARRAY_BUFFER, SkyboxCoordsTextureBuffer);
+    GL.vertexAttribPointer(TextureCoordsAttributePointer, SkyboxCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
+    GL.drawElements(GL.TRIANGLES, SkyboxIndexBuffer.itemCount, GL.UNSIGNED_SHORT, 0);
+
+
+    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, CubeIndexBuffer);
+
+    //Ground ==================================================
+    glMatrix.mat4.fromScaling(ScaleMatrix, new Float32Array([50,50,1]));
+    glMatrix.mat4.fromTranslation(TranslateMatrix, new Float32Array([0,0,-1]));
+    glMatrix.mat4.multiply(ScaleTranslateMatrix, ScaleMatrix, TranslateMatrix);
+
+    GL.uniformMatrix4fv(TranslateUniformPointer, false, new Float32Array(ScaleTranslateMatrix));
+
+    GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
+    GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+
+    GL.activeTexture(GL.TEXTURE1);
+    GL.bindTexture(GL.TEXTURE_2D, GroundTexture);
+    GL.uniform1i(SamplerPointer, 1);
+    GL.bindBuffer(GL.ARRAY_BUFFER, GroundCoordsTextureBuffer);
+    GL.vertexAttribPointer(TextureCoordsAttributePointer, GroundCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+    GL.drawElements(GL.TRIANGLES, CubeIndexBuffer.itemCount, GL.UNSIGNED_SHORT, 0);
+
     //Head
     var headVertexOffset = new Float32Array([0,1,24.5]);
-    glMatrix.mat4.identity(TranslateMatrix);
     glMatrix.mat4.fromTranslation(TranslateMatrix, headVertexOffset);
 
     var headVertexScale = new Float32Array([3,2,2.5]);
-    glMatrix.mat4.identity(ScaleMatrix);
     glMatrix.mat4.fromScaling(ScaleMatrix, headVertexScale);
 
-
-    glMatrix.mat4.identity(ScaleTranslateMatrix);
     glMatrix.mat4.multiply(ScaleTranslateMatrix, TranslateMatrix, ScaleMatrix);
 
     GL.uniformMatrix4fv(TranslateUniformPointer, false, new Float32Array(ScaleTranslateMatrix));
@@ -595,9 +806,9 @@ function RenderScene()
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
 
-    GL.activeTexture(GL.TEXTURE0);
+    GL.activeTexture(GL.TEXTURE2);
     GL.bindTexture(GL.TEXTURE_2D, HeadTexture);
-    GL.uniform1i(SamplerPointer, 0);
+    GL.uniform1i(SamplerPointer, 2);
     GL.bindBuffer(GL.ARRAY_BUFFER, HeadCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, HeadCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -606,11 +817,9 @@ function RenderScene()
 
     //Torso
     var torsoVertexOffset = new Float32Array([0,0,16]);
-    glMatrix.mat4.identity(TranslateMatrix);
     glMatrix.mat4.fromTranslation(TranslateMatrix, torsoVertexOffset);
 
     var torsoVertexScale = new Float32Array([5,3,6]);
-    glMatrix.mat4.identity(ScaleMatrix);
     glMatrix.mat4.fromScaling(ScaleMatrix, torsoVertexScale);
 
 
@@ -622,9 +831,9 @@ function RenderScene()
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
-    GL.activeTexture(GL.TEXTURE1);
+    GL.activeTexture(GL.TEXTURE3);
     GL.bindTexture(GL.TEXTURE_2D, ChestTexture);
-    GL.uniform1i(SamplerPointer, 1);
+    GL.uniform1i(SamplerPointer, 3);
     GL.bindBuffer(GL.ARRAY_BUFFER, ChestCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, ChestCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -632,11 +841,9 @@ function RenderScene()
 
     //Left Hand
     var lHandVertexOffset = new Float32Array([-6,0,17]);
-    glMatrix.mat4.identity(TranslateMatrix);
     glMatrix.mat4.fromTranslation(TranslateMatrix, lHandVertexOffset);
 
     var lHandVertexScale = new Float32Array([1,2,5]);
-    glMatrix.mat4.identity(ScaleMatrix);
     glMatrix.mat4.fromScaling(ScaleMatrix, lHandVertexScale);
 
 
@@ -648,9 +855,9 @@ function RenderScene()
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
-    GL.activeTexture(GL.TEXTURE2);
+    GL.activeTexture(GL.TEXTURE4);
     GL.bindTexture(GL.TEXTURE_2D, HandsTexture);
-    GL.uniform1i(SamplerPointer, 2);
+    GL.uniform1i(SamplerPointer, 4);
     GL.bindBuffer(GL.ARRAY_BUFFER, HandsCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, HandsCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -694,9 +901,9 @@ function RenderScene()
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
-    GL.activeTexture(GL.TEXTURE3);
+    GL.activeTexture(GL.TEXTURE5);
     GL.bindTexture(GL.TEXTURE_2D, LegsTexture);
-    GL.uniform1i(SamplerPointer, 3);
+    GL.uniform1i(SamplerPointer, 5);
     GL.bindBuffer(GL.ARRAY_BUFFER, LegsCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, LegsCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -740,9 +947,9 @@ function RenderScene()
     GL.bindBuffer(GL.ARRAY_BUFFER, CubeVerticesBuffer);
     GL.vertexAttribPointer(VertexPositionAttributePointer, CubeVerticesBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
-    GL.activeTexture(GL.TEXTURE4);
+    GL.activeTexture(GL.TEXTURE6);
     GL.bindTexture(GL.TEXTURE_2D, FeetTexture);
-    GL.uniform1i(SamplerPointer, 4);
+    GL.uniform1i(SamplerPointer, 6);
     GL.bindBuffer(GL.ARRAY_BUFFER, FeetCoordsTextureBuffer);
     GL.vertexAttribPointer(TextureCoordsAttributePointer, FeetCoordsTextureBuffer.itemSize, GL.FLOAT, false, 0, 0);
 
@@ -783,6 +990,7 @@ function StartSpinCamera()
 function StopSpinCamera()
 {
     AnimateCamera = false;
+    WasAnimated = false;
 }
 
 function TextureLoader(imageURL, textureTarget)
